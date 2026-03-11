@@ -5,15 +5,16 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "secure-dotenv"
 version = "0.1.0"
-authors = [{name = "Your Name", email = "your.email@example.com"}]
-description = "The AI-safe, drop-in replacement for Python .env files."
+authors = [{name = "Nishanth K R", email = "itsmenishanthkr@gmail.com"}]
+description = "The AI-safe, replacement for Python .env files."
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+license="MIT"
+license-files = ["LICENSE"]
 dependencies = [
     "cryptography>=41.0.0",
     "keyring>=24.0.0",
@@ -25,3 +26,7 @@ dependencies = [
 
 [project.scripts]
 secure-dotenv = "secure_dotenv.cli:cli"
+
+[tool.setuptools.packages.find]
+include = ["secure_dotenv*"]  # Only include your code
+exclude = ["assets*", "tests*"] # Explicitly ignore the assets folder

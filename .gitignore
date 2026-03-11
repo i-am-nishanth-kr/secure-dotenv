@@ -1,0 +1,4 @@
+# python packaging
+/dist
+/build
+*.egg-info
