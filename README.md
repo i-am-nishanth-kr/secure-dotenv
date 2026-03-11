@@ -136,7 +136,7 @@ Your secrets now live securely in the vault.
 Secrets are organized in a hierarchy:
 
 ```
-Project
+Project (unique id)
    ├── Profile (.env)
    ├── Profile (.env.stage)
    └── Profile (.env.local)
@@ -172,7 +172,7 @@ No manual syncing required.
 
 # CLI Commands
 
-```
+```bash
 Usage: secure-dotenv [OPTIONS] COMMAND [ARGS]...
 
 secure_dotenv: The AI-safe replacement for .env files.
@@ -214,13 +214,24 @@ Secrets are:
 OPENAI_API_KEY=sk-xxxx
 ```
 
-2️⃣ Run your program
+2️⃣  Create app.py
+
+```python
+import os
+from secure_dotenv import load_dotenv
+load_dotenv()
+
+print(os.environ['OPENAI_API_KEY'])
 
 ```
+
+3️⃣ Run your program
+
+```bash
 python app.py
 ```
 
-3️⃣ Secure dotenv automatically:
+4️⃣ Secure dotenv automatically:
 
 ```
 .env file becomes
@@ -228,8 +239,13 @@ python app.py
 OPENAI_API_KEY=
 ```
 
-4️⃣ Secret safely stored in vault.
+5️⃣ Secret safely stored in vault.
 
+6️⃣ Restore to see the saved vaules
+
+```bash
+secure-dotenv restore
+```
 ---
 
 # When to Use Secure dotenv
