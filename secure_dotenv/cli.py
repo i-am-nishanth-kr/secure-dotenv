@@ -47,6 +47,12 @@ def _get_current_project_id():
 def restore(env_name):
     """Brings back the values from the vault into the env file."""
     project_id = _get_current_project_id()
+    
+    vault = _load_vault()
+    if project_id not in vault:
+        click.secho(f"⚠️ Project not found in vault. No secrets restored.", fg="yellow")
+        return
+
     env_file = Path.cwd() / env_name
     
     if not env_file.exists():

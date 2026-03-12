@@ -83,22 +83,29 @@ def migrate_and_clear_env(filepath: str, project_id: str):
     env_name = Path(filepath).name
     current_secrets_in_file = parse_env_file(str(filepath))
     
-    # 1. Dirty Check: Do any keys have values?
-    # We only want to migrate keys where the value is NOT empty
-    keys_to_migrate = {k: v for k, v in current_secrets_in_file.items() if v and v.strip()}
-    
-    # If no keys have values, the file is already "clean" (only keys/empty values)
-    if not keys_to_migrate:
-        return 
-
-    # 2. Sync to Vault
+    # Check what already exists in the vault for this project/env
     existing_vault_secrets = get_project_secrets(project_id, env_name)
+    
+    # Determine which keys need to be migrated to the vault
+    keys_to_migrate = {}
+    for k, v in current_secrets_in_file.items():
+        # Migrate the key if the user provided a non-empty value (it takes precedence)
+        # OR if it's an empty key that does not yet exist in the vault.
+        if (v and v.strip()) or (k not in existing_vault_secrets):
+            keys_to_migrate[k] = v
+            
+    # Always sync to vault to register the project/env (even if keys_to_migrate is empty)
     updated_vault_secrets = existing_vault_secrets.copy()
     updated_vault_secrets.update(keys_to_migrate)
-    
     save_project_secrets(project_id, env_name, updated_vault_secrets, str(Path.cwd()))
     
-    # 3. Rewrite the file only for the keys we just migrated
+    # We only need to rewrite the .env file to strip values from keys that HAD non-empty values
+    keys_to_strip = {k: v for k, v in current_secrets_in_file.items() if v and v.strip()}
+    
+    if not keys_to_strip:
+        return 
+
+    # Rewrite the file only for the keys we just stripped values from
     with open(filepath, "r") as f:
         lines = f.readlines()
 
@@ -106,9 +113,9 @@ def migrate_and_clear_env(filepath: str, project_id: str):
     new_lines = []
     for line in lines:
         line_clean = line.strip()
-        # Check if line matches a key we just migrated
+        # Check if line matches a key we just stripped
         is_dirty = False
-        for k in keys_to_migrate.keys():
+        for k in keys_to_strip.keys():
             if line_clean.startswith(f"{k}="):
                 new_lines.append(f"{k}=\n")
                 modified = True
@@ -118,7 +125,7 @@ def migrate_and_clear_env(filepath: str, project_id: str):
         if not is_dirty:
             new_lines.append(line)
             
-    # 4. Save file only if a change was actually made
+    # Save file only if a change was actually made
     if modified:
         with open(filepath, "w") as f:
             f.writelines(new_lines)
