@@ -55,6 +55,13 @@ def get_project_secrets(project_id: str, env_name: str = ".env") -> dict:
 def get_all_vault_data() -> dict:
     return _load_vault()
 
+def delete_project(project_id: str):
+    """Deletes an entire project and all of its environments from the vault."""
+    vault = _load_vault()
+    if project_id in vault:
+        del vault[project_id]
+        _save_vault(vault)
+
 def parse_env_file(filepath: str) -> dict:
     secrets = {}
     with open(filepath, "r") as f:

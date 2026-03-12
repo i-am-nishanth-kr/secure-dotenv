@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-from .core import _load_vault, _save_vault
+from .core import _load_vault, _save_vault, delete_project
 
 app = FastAPI(title="Secure DotEnv Vault")
 
@@ -51,6 +51,11 @@ def delete_environment_profile(project_id: str, env_name: str):
         _save_vault(vault)
     return {"status": "success"}
 
+@app.delete("/api/vault/{project_id}")
+def delete_entire_project(project_id: str):
+    delete_project(project_id)
+    return {"status": "success"}
+
 @app.post("/api/vault/{project_id}/{env_name}")
 def create_or_update_profile(project_id: str, env_name: str, payload: SecretUpdate):
     vault = _load_vault()
@@ -91,7 +96,10 @@ def dashboard():
 
             <!-- Right Content (Secrets) -->
             <div class="w-2/3 p-6">
-                <h2 id="current-project" class="text-2xl font-bold text-gray-800 mb-2">Select a Project</h2>
+                <div class="flex items-center justify-between mb-2">
+                    <h2 id="current-project" class="text-2xl font-bold text-gray-800">Select a Project</h2>
+                    <button id="btn-delete-project" onclick="deleteCurrentProject()" class="bg-red-600 text-white px-3 py-1 rounded text-sm hidden hover:bg-red-700">Delete Project</button>
+                </div>
                 <div id="env-tabs-container" class="flex flex-wrap gap-2 mb-4 border-b pb-2">
                     <div id="env-tabs" class="flex space-x-2"></div>
                     <div class="flex items-center space-x-2">
@@ -138,9 +146,24 @@ def dashboard():
                 }
             }
 
+            async function deleteCurrentProject() {
+                if(!confirm(`Are you sure you want to completely delete this project and all its secrets? This action cannot be undone.`)) return;
+                
+                await fetch(`/api/vault/${currentProj}`, { method: 'DELETE' });
+                await loadVault();
+                currentProj = null;
+                currentEnv = null;
+                document.getElementById('current-project').innerText = "Select a Project";
+                document.getElementById('btn-delete-project').classList.add('hidden');
+                document.getElementById('env-tabs').innerHTML = '';
+                document.getElementById('secrets-table').style.display = 'none';
+                document.getElementById('add-form').style.display = 'none';
+            }
+
             function selectProject(id, envToSelect = null) {
                 currentProj = id;
                 document.getElementById('current-project').innerText = vaultData[id].path;
+                document.getElementById('btn-delete-project').classList.remove('hidden');
                 
                 // If an envToSelect is provided, use it; otherwise, default to the first one
                 const envs = Object.keys(vaultData[id].environments || {});
