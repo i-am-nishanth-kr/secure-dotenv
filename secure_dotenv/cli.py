@@ -63,7 +63,8 @@ def migrate():
     """Syncs vault with local .env files."""
     project_id = _get_current_project_id()
     env_files = list(Path.cwd().glob(".env*"))
-    env_files.remove(".env.example")
+    if ".env.example" in env_files:
+        env_files.remove(".env.example")
     from .core import migrate_and_clear_env
     for f in env_files:
         if f.name == ".secure-env-id": continue
