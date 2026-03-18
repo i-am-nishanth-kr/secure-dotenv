@@ -54,7 +54,7 @@ pip install secure-dotenv
 Run the following commands once to initialize
 
 ```bash
-# 1. initialize a vault
+# Initialize the project from the project directory where .env files exist
 secure-dotenv init
 ```
 
@@ -69,7 +69,7 @@ secure-dotenv migrate
 
 ---
 
-# Step 4: Python Usage
+## Step 4: Python Usage
 
 Replace the standard dotenv import.
 
