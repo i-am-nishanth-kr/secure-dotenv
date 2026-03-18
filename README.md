@@ -42,7 +42,7 @@ Common problems:
 
 # Quickstart
 
-## Installation
+## Step 1: Installation
 
 ```bash
 pip install secure-dotenv
@@ -50,28 +50,31 @@ pip install secure-dotenv
 
 ---
 
-## Migrate an existing `.env` file
-
-Run the following commands once to initialize and migrate your secrets.
+## Step 2: Init the project
+Run the following commands once to initialize
 
 ```bash
 # 1. initialize a vault
 secure-dotenv init
+```
 
-# 2. migrate secrets to vault
+## Step 3: (Optional) Migrate an existing `.env` file
+
+For any existing .env files in any existing project, Migrate your secrets.
+
+```bash
+# migrate secrets to vault
 secure-dotenv migrate
-
-# this is a one-time activity
 ```
 
 ---
 
-# Python Usage
+# Step 4: Python Usage
 
 Replace the standard dotenv import.
 
 ```python
-#from dotenv import load_dotenv   <- replace this
+#from dotenv import load_dotenv   <- simply replace this with below
 
 from secure_dotenv import load_dotenv
 
@@ -84,6 +87,7 @@ Your application code remains unchanged.
 
 ---
 
+# More features:
 # Web UI
 
 Secure dotenv includes a simple UI for managing secrets.
@@ -131,15 +135,16 @@ Your secrets now live securely in the vault.
 
 # Basics
 
-### Project Structure
+### Vault Structure
 
 Secrets are organized in a hierarchy:
 
 ```
-Project (unique id)
-   ├── Profile (.env)
-   ├── Profile (.env.stage)
-   └── Profile (.env.local)
+ Vault
+   └── Project (unique id)
+         ├── Profile (.env)
+         ├── Profile (.env.stage)
+         └── Profile (.env.local)
 ```
 
 Each profile contains its own secrets.
@@ -224,22 +229,21 @@ load_dotenv()
 print(os.environ['OPENAI_API_KEY'])
 
 ```
+3️⃣ Run command
 
-3️⃣ Run your program
-
+```bash
+secure-dotenv init
+```
+4️⃣ Run your program
 ```bash
 python app.py
 ```
 
-4️⃣ Secure dotenv automatically:
+5️⃣ .env file automatically becomes:
 
 ```
-.env file becomes
-
 OPENAI_API_KEY=
 ```
-
-5️⃣ Secret safely stored in vault.
 
 6️⃣ Restore to see the saved vaules
 
